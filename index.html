@@ -30,22 +30,37 @@
         <div class="step">
             <h2>🍽️ Paso 2: Especialidades del día</h2>
             <p class="step-description">Puedes dejar vacío si no hay especialidades ese día</p>
-
-            <div class="input-group">
-                <label for="special1">Especialidad 1 (opcional):</label>
-                <input type="text" id="special1" placeholder="Ej: Pancita de Res, Caldo de Camarón...">
+            
+            <div class="specialties-tabs">
+                <button type="button" class="specialty-tab-button active" id="individualTab">Individual</button>
+                <button type="button" class="specialty-tab-button" id="listTab">Lista</button>
             </div>
-            <div class="input-group">
-                <label for="special2">Especialidad 2 (opcional):</label>
-                <input type="text" id="special2" placeholder="Ej: Quesadillas de Masa Frita...">
-            </div>
-            <div class="input-group">
-                <label for="special3">Especialidad 3 (opcional):</label>
-                <input type="text" id="special3" placeholder="Ej: Mulitas de Cecina...">
-            </div>
-            <div class="input-group">
-                <label for="special4">Especialidad 4 (opcional):</label>
-                <input type="text" id="special4" placeholder="Ej: Tacos de...">
+            
+            <div class="specialty-content">
+                <div id="individual-specialties" class="specialty-pane active">
+                    <div class="input-group">
+                        <label for="special1">Especialidad 1 (opcional):</label>
+                        <input type="text" id="special1" placeholder="Ej: Pancita de Res, Caldo de Camarón...">
+                    </div>
+                    <div class="input-group">
+                        <label for="special2">Especialidad 2 (opcional):</label>
+                        <input type="text" id="special2" placeholder="Ej: Quesadillas de Masa Frita...">
+                    </div>
+                    <div class="input-group">
+                        <label for="special3">Especialidad 3 (opcional):</label>
+                        <input type="text" id="special3" placeholder="Ej: Mulitas de Cecina...">
+                    </div>
+                    <div class="input-group">
+                        <label for="special4">Especialidad 4 (opcional):</label>
+                        <input type="text" id="special4" placeholder="Ej: Tacos de...">
+                    </div>
+                </div>
+                
+                <div id="list-specialties" class="specialty-pane">
+                    <label for="specialtiesList">Pega tu lista de especialidades (una por línea):</label>
+                    <textarea id="specialtiesList" placeholder="Ej:&#10;Milanesa&#10;Pescado frito carpa cuatete&#10;Barbacoa de pollo&#10;Pechugas asadas&#10;Carne enchilada&#10;Enmoladas"></textarea>
+                    <button type="button" id="processListBtn" class="add-btn">Procesar Lista</button>
+                </div>
             </div>
         </div>
 
@@ -131,4 +146,4 @@
     <script src="script.js"></script>
 </body>
 
-</html>
+</html> 

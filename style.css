@@ -119,7 +119,8 @@ select:focus {
 }
 
 /* Pestañas */
-.output-tabs {
+.output-tabs,
+.specialties-tabs {
     display: flex;
     margin: 20px 0 0 0;
     border-bottom: 2px solid #e9ecef;
@@ -127,7 +128,8 @@ select:focus {
     border-radius: 10px 10px 0 0;
 }
 
-.tab-button {
+.tab-button,
+.specialty-tab-button {
     padding: 12px 24px;
     border: none;
     background: transparent;
@@ -139,7 +141,8 @@ select:focus {
     color: #666;
 }
 
-.tab-button.active {
+.tab-button.active,
+.specialty-tab-button.active {
     background: #25D366;
     color: white;
 }
@@ -148,15 +151,18 @@ select:focus {
     background: #1877F2;
 }
 
-.tab-button:hover:not(.active) {
+.tab-button:hover:not(.active),
+.specialty-tab-button:hover:not(.active) {
     background: rgba(0, 0, 0, 0.05);
 }
 
-.tab-pane {
+.tab-pane,
+.specialty-pane {
     display: none;
 }
 
-.tab-pane.active {
+.tab-pane.active,
+.specialty-pane.active {
     display: block;
 }
 
@@ -382,4 +388,14 @@ button:active {
 
 h2 {
     text-align: center;
+}
+
+/* Estilos para la sección de especialidades */
+.specialty-content {
+    margin-top: 15px;
+}
+
+#specialtiesList {
+    min-height: 120px;
+    margin-bottom: 15px;
 }

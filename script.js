@@ -14,10 +14,18 @@ document.addEventListener('DOMContentLoaded', function() {
     const addDrinkBtn = document.getElementById('addDrinkBtn');
     const customIngredientsContainer = document.getElementById('customIngredientsContainer');
     const customDrinksContainer = document.getElementById('customDrinksContainer');
+    
+    // Nuevas referencias para especialidades
+    const individualTab = document.getElementById('individualTab');
+    const listTab = document.getElementById('listTab');
+    const individualSpecialties = document.getElementById('individual-specialties');
+    const listSpecialties = document.getElementById('list-specialties');
+    const specialtiesList = document.getElementById('specialtiesList');
+    const processListBtn = document.getElementById('processListBtn');
 
     let menuHistory = [];
 
-    // Configurar pestañas
+    // Configurar pestañas de salida
     tabButtons.forEach(button => {
         button.addEventListener('click', () => {
             const tabName = button.getAttribute('data-tab');
@@ -30,6 +38,60 @@ document.addEventListener('DOMContentLoaded', function() {
             button.classList.add('active');
             document.getElementById(`${tabName}-tab`).classList.add('active');
         });
+    });
+
+    // Configurar pestañas de especialidades
+    individualTab.addEventListener('click', () => {
+        individualTab.classList.add('active');
+        listTab.classList.remove('active');
+        individualSpecialties.classList.add('active');
+        listSpecialties.classList.remove('active');
+    });
+
+    listTab.addEventListener('click', () => {
+        listTab.classList.add('active');
+        individualTab.classList.remove('active');
+        listSpecialties.classList.add('active');
+        individualSpecialties.classList.remove('active');
+    });
+
+    // Procesar lista de especialidades
+    processListBtn.addEventListener('click', function() {
+        const listText = specialtiesList.value.trim();
+        if (!listText) {
+            alert('Por favor, ingresa una lista de especialidades.');
+            return;
+        }
+
+        // Dividir por líneas y limpiar cada elemento
+        const specialties = listText.split('\n')
+            .map(item => item.trim())
+            .filter(item => item !== '');
+
+        if (specialties.length === 0) {
+            alert('No se encontraron especialidades válidas en la lista.');
+            return;
+        }
+
+        // Limpiar los campos individuales
+        for (let i = 1; i <= 4; i++) {
+            document.getElementById(`special${i}`).value = '';
+        }
+
+        // Llenar los campos individuales con las especialidades procesadas
+        for (let i = 0; i < Math.min(specialties.length, 4); i++) {
+            document.getElementById(`special${i + 1}`).value = specialties[i];
+        }
+
+        // Si hay más de 4 especialidades, mostrar alerta
+        if (specialties.length > 4) {
+            alert(`Se procesaron ${specialties.length} especialidades, pero solo se pueden mostrar 4. Se han llenado los primeros 4 campos.`);
+        } else {
+            alert(`Se procesaron ${specialties.length} especialidades correctamente.`);
+        }
+
+        // Cambiar a la vista individual
+        individualTab.click();
     });
 
     // Funciones para ingredientes personalizados
@@ -358,120 +420,186 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Sistema de historial
+    // Funciones de historial
     function saveMenuToHistory(menuData) {
-        menuHistory = menuHistory.filter(menu => menu.date !== menuData.date);
-        menuHistory.unshift(menuData);
-        if (menuHistory.length > 10) {
-            menuHistory.pop();
+        // Verificar si ya existe un menú para esta fecha
+        const existingIndex = menuHistory.findIndex(item => item.date === menuData.date);
+        
+        if (existingIndex !== -1) {
+            menuHistory[existingIndex] = menuData;
+        } else {
+            menuHistory.push(menuData);
         }
-        localStorage.setItem('menuHistoryAntojitos', JSON.stringify(menuHistory));
-        renderHistory();
-    }
 
-    function deleteMenuFromHistory(event, index) {
-        event.stopPropagation();
-        menuHistory.splice(index, 1);
-        localStorage.setItem('menuHistoryAntojitos', JSON.stringify(menuHistory));
+        // Ordenar por fecha (más reciente primero)
+        menuHistory.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        // Guardar en localStorage
+        localStorage.setItem('menuHistory', JSON.stringify(menuHistory));
+
+        // Actualizar vista
         renderHistory();
     }
 
     function renderHistory() {
         historyContainer.innerHTML = '';
+        
         if (menuHistory.length === 0) {
-            historyContainer.innerHTML = '<p>No hay menús guardados.</p>';
+            historyContainer.innerHTML = '<p>No hay menús anteriores guardados.</p>';
             return;
         }
+
         menuHistory.forEach((menu, index) => {
-            const item = document.createElement('div');
-            item.className = 'history-item';
+            const date = new Date(menu.date + 'T12:00:00');
+            const formattedDate = date.toLocaleDateString('es-MX', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
             
-            const displayText = menu.specials.length > 0 ? 
-                menu.specials[0] : 
-                (menu.ingredients.length > 0 ? menu.ingredients[0] + '...' : 'Menú personalizado');
-                
-            item.innerHTML = `
+            const capitalizedDate = formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
+            
+            const historyItem = document.createElement('div');
+            historyItem.className = 'history-item';
+            historyItem.innerHTML = `
                 <div>
-                    <div class="history-item-date">${menu.date} (${menu.dayType})</div>
-                    <div class="history-item-content">${displayText}</div>
+                    <div class="history-item-date">${capitalizedDate}</div>
+                    <div class="history-item-content">
+                        ${menu.specials.length > 0 ? 'Especialidades: ' + menu.specials.join(', ') : 'Sin especialidades'}
+                    </div>
                 </div>
-                <button class="delete-btn" title="Eliminar menú">🗑️</button>
+                <button class="delete-btn" data-index="${index}">✕</button>
             `;
-            item.addEventListener('click', (e) => {
+            
+            historyItem.addEventListener('click', (e) => {
                 if (!e.target.classList.contains('delete-btn')) {
-                    loadMenuFromHistory(index);
+                    loadMenuFromHistory(menu);
                 }
             });
-            item.querySelector('.delete-btn').addEventListener('click', (event) => deleteMenuFromHistory(event, index));
-            historyContainer.appendChild(item);
+            
+            const deleteBtn = historyItem.querySelector('.delete-btn');
+            deleteBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                deleteMenuFromHistory(index);
+            });
+            
+            historyContainer.appendChild(historyItem);
         });
     }
 
-    function loadMenuFromHistory(index) {
-        const menu = menuHistory[index];
+    function loadMenuFromHistory(menu) {
+        // Establecer fecha
         dateInput.value = menu.date;
+        
+        // Establecer tipo de día
         dayTypeSelect.value = menu.dayType;
         
-        // Cargar especialidades
+        // Limpiar especialidades
         for (let i = 1; i <= 4; i++) {
-            const input = document.getElementById(`special${i}`);
-            input.value = menu.specials[i - 1] || '';
+            document.getElementById(`special${i}`).value = '';
         }
-
-        // Cargar ingredientes base
-        document.querySelectorAll('.ingredients-preset input[type="checkbox"]').forEach(cb => {
-            const labelText = cb.parentElement.textContent.trim();
-            cb.checked = menu.ingredients.includes(labelText);
+        
+        // Llenar especialidades
+        menu.specials.forEach((special, index) => {
+            if (index < 4) {
+                document.getElementById(`special${index + 1}`).value = special;
+            }
         });
-
-        // Limpiar y cargar ingredientes personalizados
-        customIngredientsContainer.innerHTML = '';
-        const customIngredients = menu.ingredients.filter(ingredient => {
-            const baseIngredients = Array.from(document.querySelectorAll('.ingredients-preset input[type="checkbox"]'))
-                .map(cb => cb.parentElement.textContent.trim());
-            return !baseIngredients.includes(ingredient);
+        
+        // Limpiar y llenar ingredientes base
+        const baseIngredientCheckboxes = document.querySelectorAll('.ingredients-preset input[type="checkbox"]');
+        baseIngredientCheckboxes.forEach(cb => {
+            const ingredientText = cb.parentElement.textContent.trim();
+            cb.checked = menu.ingredients.includes(ingredientText);
         });
-
-        customIngredients.forEach(ingredient => {
-            addCustomIngredient();
-            const lastInput = customIngredientsContainer.lastElementChild.querySelector('.custom-ingredient');
-            lastInput.value = ingredient;
+        
+        // Limpiar ingredientes personalizados
+        const customIngredientGroups = document.querySelectorAll('.custom-ingredient-group');
+        customIngredientGroups.forEach(group => {
+            if (group !== customIngredientGroups[0]) {
+                group.remove();
+            }
         });
-
-        // Cargar bebidas base
-        document.querySelectorAll('.drinks-grid input[type="checkbox"]').forEach(cb => {
-            const labelText = cb.parentElement.textContent.trim();
-            cb.checked = menu.drinks.includes(labelText);
+        
+        // Limpiar el primer campo de ingredientes personalizados
+        const firstCustomIngredient = document.querySelector('.custom-ingredient');
+        if (firstCustomIngredient) {
+            firstCustomIngredient.value = '';
+        }
+        
+        // Agregar ingredientes personalizados que no están en la lista base
+        const baseIngredients = Array.from(document.querySelectorAll('.ingredients-preset input[type="checkbox"]'))
+            .map(cb => cb.parentElement.textContent.trim());
+            
+        menu.ingredients.forEach(ingredient => {
+            if (!baseIngredients.includes(ingredient)) {
+                addCustomIngredient();
+                const customInputs = document.querySelectorAll('.custom-ingredient');
+                const lastInput = customInputs[customInputs.length - 1];
+                lastInput.value = ingredient;
+            }
         });
-
-        // Limpiar y cargar bebidas personalizadas
-        customDrinksContainer.innerHTML = '';
-        const customDrinks = menu.drinks.filter(drink => {
-            const baseDrinks = Array.from(document.querySelectorAll('.drinks-grid input[type="checkbox"]'))
-                .map(cb => cb.parentElement.textContent.trim());
-            return !baseDrinks.includes(drink);
+        
+        // Limpiar y llenar bebidas base
+        const baseDrinkCheckboxes = document.querySelectorAll('.drinks-grid input[type="checkbox"]');
+        baseDrinkCheckboxes.forEach(cb => {
+            const drinkText = cb.parentElement.textContent.trim();
+            cb.checked = menu.drinks.includes(drinkText);
         });
-
-        customDrinks.forEach(drink => {
-            addCustomDrink();
-            const lastInput = customDrinksContainer.lastElementChild.querySelector('.custom-drink');
-            lastInput.value = drink;
+        
+        // Limpiar bebidas personalizadas
+        const customDrinkGroups = document.querySelectorAll('.custom-drink-group');
+        customDrinkGroups.forEach(group => {
+            if (group !== customDrinkGroups[0]) {
+                group.remove();
+            }
         });
+        
+        // Limpiar el primer campo de bebidas personalizadas
+        const firstCustomDrink = document.querySelector('.custom-drink');
+        if (firstCustomDrink) {
+            firstCustomDrink.value = '';
+        }
+        
+        // Agregar bebidas personalizadas que no están en la lista base
+        const baseDrinks = Array.from(document.querySelectorAll('.drinks-grid input[type="checkbox"]'))
+            .map(cb => cb.parentElement.textContent.trim());
+            
+        menu.drinks.forEach(drink => {
+            if (!baseDrinks.includes(drink)) {
+                addCustomDrink();
+                const customInputs = document.querySelectorAll('.custom-drink');
+                const lastInput = customInputs[customInputs.length - 1];
+                lastInput.value = drink;
+            }
+        });
+        
+        alert('Menú cargado desde el historial. Ahora puedes generar el menú o hacer modificaciones.');
     }
 
-    function loadHistoryFromStorage() {
-        const storedHistory = localStorage.getItem('menuHistoryAntojitos');
-        if (storedHistory) {
-            menuHistory = JSON.parse(storedHistory);
+    function deleteMenuFromHistory(index) {
+        if (confirm('¿Estás seguro de que quieres eliminar este menú del historial?')) {
+            menuHistory.splice(index, 1);
+            localStorage.setItem('menuHistory', JSON.stringify(menuHistory));
             renderHistory();
         }
     }
 
-    // Inicialización
-    const today = new Date();
-    const offset = today.getTimezoneOffset();
-    const todayLocal = new Date(today.getTime() - (offset * 60 * 1000));
-    dateInput.value = todayLocal.toISOString().split('T')[0];
+    // Inicializar
+    function initialize() {
+        // Establecer fecha actual como valor por defecto
+        const today = new Date();
+        const formattedDate = today.toISOString().split('T')[0];
+        dateInput.value = formattedDate;
+        
+        // Cargar historial desde localStorage
+        const savedHistory = localStorage.getItem('menuHistory');
+        if (savedHistory) {
+            menuHistory = JSON.parse(savedHistory);
+            renderHistory();
+        }
+    }
 
-    loadHistoryFromStorage();
+    initialize();
 });
