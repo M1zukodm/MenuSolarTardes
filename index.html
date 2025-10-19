@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Menú 2</title>
+    <link rel="icon" href="img/logo.png" type="image/png">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container">
+        <h1>🌮 Generador de Menú</h1>
+        <img src="img/logo.png" alt="Logo Solar" title="Logo Solar Surge" class="logo-image">
+
+        <div class="step">
+            <h2>📅 Paso 1: Configuración del día</h2>
+            <label for="menuDate">Selecciona la fecha:</label>
+            <input type="date" id="menuDate" required>
+
+            <label for="dayType">Tipo de día:</label>
+            <select id="dayType">
+                <option value="domingo">Domingo</option>
+                <option value="tarde">Tarde entre semana</option>
+                <option value="especial">Día especial</option>
+            </select>
+        </div>
+
+        <div class="step">
+            <h2>🍽️ Paso 2: Especialidades del día</h2>
+            <p class="step-description">Puedes dejar vacío si no hay especialidades ese día</p>
+
+            <div class="input-group">
+                <label for="special1">Especialidad 1 (opcional):</label>
+                <input type="text" id="special1" placeholder="Ej: Pancita de Res, Caldo de Camarón...">
+            </div>
+            <div class="input-group">
+                <label for="special2">Especialidad 2 (opcional):</label>
+                <input type="text" id="special2" placeholder="Ej: Quesadillas de Masa Frita...">
+            </div>
+            <div class="input-group">
+                <label for="special3">Especialidad 3 (opcional):</label>
+                <input type="text" id="special3" placeholder="Ej: Mulitas de Cecina...">
+            </div>
+            <div class="input-group">
+                <label for="special4">Especialidad 4 (opcional):</label>
+                <input type="text" id="special4" placeholder="Ej: Tacos de...">
+            </div>
+        </div>
+
+        <div class="step">
+            <h2>🌮 Paso 3: Ingredientes para Sopes y Huaraches</h2>
+            <div class="ingredients-section">
+                <div class="ingredients-preset">
+                    <h3>Ingredientes base (siempre disponibles):</h3>
+                    <div class="ingredients-grid">
+                        <label><input type="checkbox" checked> Pollo</label>
+                        <label><input type="checkbox" checked> Chorizo con papa</label>
+                        <label><input type="checkbox" checked> Queso Oaxaca</label>
+                        <label><input type="checkbox" checked> Frijoles</label>
+                        <label><input type="checkbox" checked> Tinga</label>
+                        <label><input type="checkbox" checked> Chicharrón</label>
+                    </div>
+                </div>
+
+                <div class="ingredients-custom">
+                    <h3>Ingredientes adicionales (opcionales):</h3>
+                    <div id="customIngredientsContainer">
+                        <div class="custom-ingredient-group">
+                            <input type="text" class="custom-ingredient" placeholder="Ej: Cecina, Pastor, Carnitas...">
+                            <button type="button" class="remove-ingredient" onclick="removeIngredient(this)">✕</button>
+                        </div>
+                    </div>
+                    <button type="button" id="addIngredientBtn" class="add-btn">➕ Agregar otro ingrediente</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="step">
+            <h2>🥤 Paso 4: Bebidas disponibles</h2>
+            <div class="drinks-grid">
+                <label><input type="checkbox" checked> Refrescos bien fríos 🧊</label>
+                <label><input type="checkbox"> Agua de Jamaica</label>
+                <label><input type="checkbox"> Agua de Horchata</label>
+                <label><input type="checkbox"> Agua Pepino con limón</label>
+                <label><input type="checkbox"> Agua de Limón</label>
+                <label><input type="checkbox"> Té helado</label>
+            </div>
+        
+            <div class="custom-drinks">
+                <h3>Bebidas adicionales (opcionales):</h3>
+                <div id="customDrinksContainer">
+                    <div class="custom-drink-group">
+                        <input type="text" class="custom-drink" placeholder="Ej: Tamarindo, Piña...">
+                        <button type="button" class="remove-drink" onclick="removeDrink(this)">✕</button>
+                    </div>
+                </div>
+                <button type="button" id="addDrinkBtn" class="add-btn">➕ Agregar otra bebida</button>
+            </div>
+        </div>
+
+        <div class="step">
+            <h2>🎯 Paso 5: ¡Genera tu menú!</h2>
+            <button id="generateBtn">🌮 Generar Menú Completo</button>
+
+            <div class="output-tabs">
+                <button class="tab-button active" data-tab="whatsapp">📱 WhatsApp</button>
+                <button class="tab-button" data-tab="facebook">📘 Facebook</button>
+            </div>
+
+            <div class="tab-content">
+                <div id="whatsapp-tab" class="tab-pane active">
+                    <textarea id="whatsappOutput" readonly placeholder="Menú para WhatsApp..."></textarea>
+                    <button id="copyWhatsappBtn" class="whatsapp-btn">📋 Copiar WhatsApp</button>
+                </div>
+                <div id="facebook-tab" class="tab-pane">
+                    <textarea id="facebookOutput" readonly placeholder="Menú para Facebook..."></textarea>
+                    <button id="copyFacebookBtn" class="facebook-btn">📋 Copiar Facebook</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="step history-section">
+            <h2>📋 Menús Anteriores</h2>
+            <p>Haz clic en un menú anterior para cargarlo.</p>
+            <div id="historyContainer"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
