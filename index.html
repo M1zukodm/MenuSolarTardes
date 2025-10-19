@@ -27,42 +27,58 @@
             </select>
         </div>
 
-        <div class="step">
-            <h2>🍽️ Paso 2: Especialidades del día</h2>
-            <p class="step-description">Puedes dejar vacío si no hay especialidades ese día</p>
-            
-            <div class="specialties-tabs">
-                <button type="button" class="specialty-tab-button active" id="individualTab">Individual</button>
-                <button type="button" class="specialty-tab-button" id="listTab">Lista</button>
+    <div class="step">
+        <h2>🍽️ Paso 2: Especialidades del día</h2>
+        <p class="step-description">Mulitas de Cecina y Quesadillas de Masa Frita siempre están disponibles al final</p>
+    
+        <div class="specialties-tabs">
+            <button type="button" class="specialty-tab-button active" id="individualTab">Individual</button>
+            <button type="button" class="specialty-tab-button" id="listTab">Lista</button>
+        </div>
+    
+        <div class="specialty-content">
+            <div id="individual-specialties" class="specialty-pane active">
+                <!-- Especialidades variables -->
+                <div class="input-group">
+                    <label for="special1">Especialidad 1 (opcional):</label>
+                    <input type="text" id="special1" placeholder="Ej: Pancita de Res">
+                </div>
+                <div class="input-group">
+                    <label for="special2">Especialidad 2 (opcional):</label>
+                    <input type="text" id="special2" placeholder="Ej: Caldo de camarón">
+                </div>
+    
+                <!-- Especialidades fijas que siempre están -->
+                <div class="input-group">
+                    <label for="special3">Especialidad 3 (siempre disponible):</label>
+                    <input type="text" id="special3" value="Mulitas de Cecina" readonly class="always-available">
+                </div>
+                <div class="input-group">
+                    <label for="special4">Especialidad 4 (siempre disponible):</label>
+                    <input type="text" id="special4" value="Quesadillas de Masa Frita" readonly class="always-available">
+                </div>
+    
+                <!-- Especialidades adicionales extra -->
+                <div class="input-group">
+                    <label for="special5">Especialidad 5 (adicional extra):</label>
+                    <input type="text" id="special5" placeholder="Ej: Tacos de cecina">
+                </div>
+                <div class="input-group">
+                    <label for="special6">Especialidad 6 (adicional extra):</label>
+                    <input type="text" id="special6" placeholder="Ej: Carne enchilada">
+                </div>
             </div>
-            
-            <div class="specialty-content">
-                <div id="individual-specialties" class="specialty-pane active">
-                    <div class="input-group">
-                        <label for="special1">Especialidad 1 (opcional):</label>
-                        <input type="text" id="special1" placeholder="Ej: Pancita de Res, Caldo de Camarón...">
-                    </div>
-                    <div class="input-group">
-                        <label for="special2">Especialidad 2 (opcional):</label>
-                        <input type="text" id="special2" placeholder="Ej: Quesadillas de Masa Frita...">
-                    </div>
-                    <div class="input-group">
-                        <label for="special3">Especialidad 3 (opcional):</label>
-                        <input type="text" id="special3" placeholder="Ej: Mulitas de Cecina...">
-                    </div>
-                    <div class="input-group">
-                        <label for="special4">Especialidad 4 (opcional):</label>
-                        <input type="text" id="special4" placeholder="Ej: Tacos de...">
-                    </div>
-                </div>
-                
-                <div id="list-specialties" class="specialty-pane">
-                    <label for="specialtiesList">Pega tu lista de especialidades (una por línea):</label>
-                    <textarea id="specialtiesList" placeholder="Ej:&#10;Milanesa&#10;Pescado frito carpa cuatete&#10;Barbacoa de pollo&#10;Pechugas asadas&#10;Carne enchilada&#10;Enmoladas"></textarea>
-                    <button type="button" id="processListBtn" class="add-btn">Procesar Lista</button>
-                </div>
+    
+            <div id="list-specialties" class="specialty-pane">
+                <label for="specialtiesList">Pega tu lista de especialidades (una por línea):</label>
+                <p class="step-description">Nota: Mulitas de Cecina y Quesadillas de Masa Frita se agregarán automáticamente
+                    al final</p>
+                <textarea id="specialtiesList"
+                    placeholder="Ej:&#10;Milanesa&#10;Pescado frito carpa cuatete&#10;Barbacoa de pollo&#10;Pechugas asadas"></textarea>
+                <button type="button" id="processListBtn" class="add-btn">Procesar Lista</button>
             </div>
         </div>
+    </div>
 
         <div class="step">
             <h2>🌮 Paso 3: Ingredientes para Sopes y Huaraches</h2>

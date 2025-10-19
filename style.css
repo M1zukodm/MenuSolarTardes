@@ -399,3 +399,16 @@ h2 {
     min-height: 120px;
     margin-bottom: 15px;
 }
+
+/* Estilos para especialidades siempre disponibles */
+.always-available {
+    background-color: #f0f8ff;
+    border-color: #4CAF50;
+    color: #2e7d32;
+    font-weight: bold;
+}
+
+.always-available:focus {
+    border-color: #4CAF50;
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+}

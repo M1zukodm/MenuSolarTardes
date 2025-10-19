@@ -73,21 +73,23 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        // Limpiar los campos individuales
-        for (let i = 1; i <= 4; i++) {
-            document.getElementById(`special${i}`).value = '';
+        // Limpiar solo los campos variables (1, 2, 5, 6) - las fijas 3 y 4 no se tocan
+        document.getElementById('special1').value = '';
+        document.getElementById('special2').value = '';
+        document.getElementById('special5').value = '';
+        document.getElementById('special6').value = '';
+
+        // Llenar los campos variables con las especialidades procesadas
+        const variableFields = ['special1', 'special2', 'special5', 'special6'];
+        for (let i = 0; i < Math.min(specialties.length, variableFields.length); i++) {
+            document.getElementById(variableFields[i]).value = specialties[i];
         }
 
-        // Llenar los campos individuales con las especialidades procesadas
-        for (let i = 0; i < Math.min(specialties.length, 4); i++) {
-            document.getElementById(`special${i + 1}`).value = specialties[i];
-        }
-
-        // Si hay más de 4 especialidades, mostrar alerta
-        if (specialties.length > 4) {
-            alert(`Se procesaron ${specialties.length} especialidades, pero solo se pueden mostrar 4. Se han llenado los primeros 4 campos.`);
+        // Si hay más especialidades que campos variables, mostrar alerta
+        if (specialties.length > variableFields.length) {
+            alert(`Se procesaron ${specialties.length} especialidades, pero solo se pueden mostrar ${variableFields.length} variables. Mulitas de Cecina y Quesadillas de Masa Frita siempre estarán incluidas.`);
         } else {
-            alert(`Se procesaron ${specialties.length} especialidades correctamente.`);
+            alert(`Se procesaron ${specialties.length} especialidades correctamente. Mulitas de Cecina y Quesadillas de Masa Frita siempre estarán incluidas.`);
         }
 
         // Cambiar a la vista individual
@@ -153,14 +155,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const config = dayConfigs[dayType];
 
-        // Obtener especialidades (solo las que tienen contenido)
+        // Obtener especialidades (variables + fijas siempre)
         const specials = [];
-        for (let i = 1; i <= 4; i++) {
-            const special = document.getElementById(`special${i}`).value.trim();
+
+        // Especialidades variables (1, 2, 5, 6)
+        const variableFields = ['special1', 'special2', 'special5', 'special6'];
+        variableFields.forEach(fieldId => {
+            const special = document.getElementById(fieldId).value.trim();
             if (special) {
                 specials.push(special);
             }
-        }
+        });
+
+        // Especialidades fijas que siempre están (3 y 4)
+        specials.push("Mulitas de Cecina");
+        specials.push("Quesadillas de Masa Frita");
 
         // Obtener ingredientes base seleccionados
         const baseIngredientCheckboxes = document.querySelectorAll('.ingredients-preset input[type="checkbox"]:checked');
@@ -261,33 +270,46 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const config = dayConfigs[dayType];
 
-        // Obtener datos (misma lógica que WhatsApp)
+        // Obtener especialidades (variables + fijas siempre)
         const specials = [];
-        for (let i = 1; i <= 4; i++) {
-            const special = document.getElementById(`special${i}`).value.trim();
+
+        // Especialidades variables (1, 2, 5, 6)
+        const variableFields = ['special1', 'special2', 'special5', 'special6'];
+        variableFields.forEach(fieldId => {
+            const special = document.getElementById(fieldId).value.trim();
             if (special) {
                 specials.push(special);
             }
-        }
+        });
 
+        // Especialidades fijas que siempre están (3 y 4)
+        specials.push("Mulitas de Cecina");
+        specials.push("Quesadillas de Masa Frita");
+
+        // Obtener ingredientes base seleccionados
         const baseIngredientCheckboxes = document.querySelectorAll('.ingredients-preset input[type="checkbox"]:checked');
         const baseIngredients = Array.from(baseIngredientCheckboxes).map(cb => cb.parentElement.textContent.trim());
 
+        // Obtener ingredientes personalizados
         const customIngredientInputs = document.querySelectorAll('.custom-ingredient');
         const customIngredients = Array.from(customIngredientInputs)
             .map(input => input.value.trim())
             .filter(ingredient => ingredient !== '');
 
+        // Combinar todos los ingredientes
         const allIngredients = [...baseIngredients, ...customIngredients];
 
+        // Obtener bebidas base seleccionadas
         const baseDrinkCheckboxes = document.querySelectorAll('.drinks-grid input[type="checkbox"]:checked');
         const baseDrinks = Array.from(baseDrinkCheckboxes).map(cb => cb.parentElement.textContent.trim());
 
+        // Obtener bebidas personalizadas
         const customDrinkInputs = document.querySelectorAll('.custom-drink');
         const customDrinks = Array.from(customDrinkInputs)
             .map(input => input.value.trim())
             .filter(drink => drink !== '');
 
+        // Combinar todas las bebidas
         const allDrinks = [...baseDrinks, ...customDrinks];
 
         if (allIngredients.length === 0 && specials.length === 0) {
@@ -356,13 +378,18 @@ document.addEventListener('DOMContentLoaded', function() {
             drinks: []
         };
 
-        // Guardar especialidades
-        for (let i = 1; i <= 4; i++) {
-            const special = document.getElementById(`special${i}`).value.trim();
+        // Guardar especialidades variables
+        const variableFields = ['special1', 'special2', 'special5', 'special6'];
+        variableFields.forEach(fieldId => {
+            const special = document.getElementById(fieldId).value.trim();
             if (special) {
                 menuData.specials.push(special);
             }
-        }
+        });
+
+        // Siempre incluir las fijas al final
+        menuData.specials.push("Mulitas de Cecina");
+        menuData.specials.push("Quesadillas de Masa Frita");
 
         // Guardar ingredientes
         const baseIngredientCheckboxes = document.querySelectorAll('.ingredients-preset input[type="checkbox"]:checked');
@@ -495,15 +522,21 @@ document.addEventListener('DOMContentLoaded', function() {
         // Establecer tipo de día
         dayTypeSelect.value = menu.dayType;
         
-        // Limpiar especialidades
-        for (let i = 1; i <= 4; i++) {
-            document.getElementById(`special${i}`).value = '';
-        }
-        
-        // Llenar especialidades
+        // Limpiar campos variables (las fijas 3 y 4 no se tocan)
+        document.getElementById('special1').value = '';
+        document.getElementById('special2').value = '';
+        document.getElementById('special5').value = '';
+        document.getElementById('special6').value = '';
+
+        // Llenar especialidades variables (excluyendo las 2 últimas que son las fijas)
+        const variableFields = ['special1', 'special2', 'special5', 'special6'];
+        let variableIndex = 0;
+
         menu.specials.forEach((special, index) => {
-            if (index < 4) {
-                document.getElementById(`special${index + 1}`).value = special;
+            // Excluir las últimas 2 que son las fijas
+            if (index < menu.specials.length - 2 && variableIndex < variableFields.length) {
+                document.getElementById(variableFields[variableIndex]).value = special;
+                variableIndex++;
             }
         });
         
@@ -592,6 +625,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const today = new Date();
         const formattedDate = today.toISOString().split('T')[0];
         dateInput.value = formattedDate;
+        
+        // Establecer especialidades fijas
+        document.getElementById('special3').value = "Mulitas de Cecina";
+        document.getElementById('special4').value = "Quesadillas de Masa Frita";
         
         // Cargar historial desde localStorage
         const savedHistory = localStorage.getItem('menuHistory');
