@@ -130,8 +130,8 @@ document.addEventListener('DOMContentLoaded', function() {
     addIngredientBtn.addEventListener('click', addCustomIngredient);
     addDrinkBtn.addEventListener('click', addCustomDrink);
 
-    // Generar mensaje para WhatsApp
-    function generateWhatsAppMessage() {
+    // Generar mensaje base (sin variantes)
+    function generateBaseMessage(platform) {
         const date = new Date(dateInput.value + 'T12:00:00');
         const dayName = date.toLocaleDateString('es-MX', { weekday: 'long' });
         const capitalizedDayName = dayName.charAt(0).toUpperCase() + dayName.slice(1);
@@ -207,12 +207,12 @@ document.addEventListener('DOMContentLoaded', function() {
             return '';
         }
 
-        // Construir mensaje WhatsApp
-        let message = `${config.saludo}\n\n${config.titulo}\n\n`;
+        // Construir mensaje base
+        let message = '';
 
         // Agregar especialidades si existen
         if (specials.length > 0) {
-            message += `🍽 *Especialidades:*\n`;
+            message += `🍽 ${platform === 'whatsapp' ? '*' : ''}Especialidades:${platform === 'whatsapp' ? '*' : ''}\n`;
             specials.forEach(special => {
                 message += `✅ ${special}\n`;
             });
@@ -221,7 +221,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Agregar ingredientes si existen
         if (allIngredients.length > 0) {
-            message += `🌮 *Sopes y Huaraches con:*\n`;
+            message += `🌮 ${platform === 'whatsapp' ? '*' : ''}Sopes y Huaraches con:${platform === 'whatsapp' ? '*' : ''}\n`;
             allIngredients.forEach((ingredient, index) => {
                 const emojis = ['🔵', '🟢', '🟡', '🟠', '🔴', '🟣', '⚫', '⚪', '🟤', '🔶'];
                 message += `${emojis[index] || '✅'} ${ingredient}\n`;
@@ -231,125 +231,195 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Agregar bebidas si existen
         if (allDrinks.length > 0) {
-            message += `🥤 *Bebidas:*\n`;
-            allDrinks.forEach(drink => {
-                message += `➡ ${drink}\n`;
+            message += `🥤 ${platform === 'whatsapp' ? '*' : ''}Bebidas:${platform === 'whatsapp' ? '*' : ''}\n`;
+            allDrinks.forEach((drink) => {
+                message += `🧊 ${drink.replace(' 🧊', '')}\n`;
             });
             message += `\n`;
         }
 
-        message += `📍 *Ubicación:* Coyuca de Benítez (zona centro y colonias cercanas)\n` +
-                   `🛵 *Servicio a domicilio*\n` +
-                   `📲 *Haz tu pedido al:* 781 100 3796\n\n` +
-                   `🎉 ¡Dale sabor a tu ${dayType === 'domingo' ? 'tarde de domingo' : 'tarde'} con nosotros! 🤩🔥`;
+        // Información de contacto
+        message += `${platform === 'whatsapp' ? '*' : ''}📍 Ubicación:${platform === 'whatsapp' ? '*' : ''} Coyuca de Benítez en casa de Nini.\n` +
+                   `${platform === 'whatsapp' ? '*' : ''}🛵 Servicio a domicilio${platform === 'whatsapp' ? '*' : ''} (zona centro y colonias cercanas)\n` +
+                   `${platform === 'whatsapp' ? '*' : ''}📲 Pedidos con anticipación${platform === 'whatsapp' ? '*' : ''}\n` +
+                   `   ${platform === 'whatsapp' ? '*' : ''}¡Todo fresco y al momento!${platform === 'whatsapp' ? '*' : ''}\n` +
+                   `   ${platform === 'whatsapp' ? '*' : ''}Llama o escribe al:${platform === 'whatsapp' ? '*' : ''}\n` +
+                   `📲 781 109 3796\n\n`;
 
-        return message;
+        return {
+            message: message,
+            config: config,
+            dayType: dayType
+        };
+    }
+
+    // Generar mensaje para WhatsApp
+    function generateWhatsAppMessage() {
+        const baseData = generateBaseMessage('whatsapp');
+        if (baseData === '') return '';
+
+        const { message, config, dayType } = baseData;
+        
+        let fullMessage = `${config.saludo}\n\n${config.titulo}\n\n${message}`;
+        fullMessage += `🎉 ¡Dale sabor a tu ${dayType === 'domingo' ? 'tarde de domingo' : 'tarde'} con nosotros! 🤩🔥`;
+
+        return fullMessage;
     }
 
     // Generar mensaje para Facebook
     function generateFacebookMessage() {
-        const date = new Date(dateInput.value + 'T12:00:00');
-        const dayName = date.toLocaleDateString('es-MX', { weekday: 'long' });
-        const capitalizedDayName = dayName.charAt(0).toUpperCase() + dayName.slice(1);
-        const dayType = dayTypeSelect.value;
+        const baseData = generateBaseMessage('facebook');
+        if (baseData === '') return '';
 
-        const dayConfigs = {
-            'domingo': {
-                saludo: '🌞 ¡Buenas tardes a todos! 🙌🏻\nEste domingo es perfecto para darse un gustito especial… 😋🍲',
-                titulo: '✨ ¡Miren nuestro delicioso menú del domingo! ✨'
-            },
-            'tarde': {
-                saludo: '🌅 ¡Buenas tardes! 🙌🏻\nEsta tarde es perfecta para consentirse con unos auténticos antojitos mexicanos… 😋🌮',
-                titulo: '✨ ¡Miren nuestro delicioso menú de la tarde! ✨'
-            },
-            'especial': {
-                saludo: '🎉 ¡Buenas tardes a todos! 🙌🏻\n¡Hoy es un día especial para disfrutar de los mejores antojitos mexicanos! 😋🍽️',
-                titulo: '✨ ¡Miren nuestro delicioso menú especial de hoy! ✨'
-            }
-        };
+        const { message, config, dayType } = baseData;
+        
+        let fullMessage = `${config.saludo}\n\n${config.titulo}\n\n${message}`;
+        fullMessage += `🎉 ¡Dale sabor a tu ${dayType === 'domingo' ? 'tarde de domingo' : 'tarde'} con nosotros! 🤩🔥`;
 
-        const config = dayConfigs[dayType];
+        return fullMessage;
+    }
 
-        // Obtener especialidades (variables + fijas siempre)
-        const specials = [];
-
-        // Especialidades variables (1, 2, 5, 6)
-        const variableFields = ['special1', 'special2', 'special5', 'special6'];
-        variableFields.forEach(fieldId => {
-            const special = document.getElementById(fieldId).value.trim();
-            if (special) {
-                specials.push(special);
-            }
+    // Función para generar variantes de mensajes
+    function generateMessageVariants(baseMessage, platform, dayType) {
+        const variants = [];
+        
+        // Extraer el contenido principal (sin saludo y título)
+        const lines = baseMessage.split('\n');
+        const saludoIndex = lines.findIndex(line => line.includes('¡Buenas tardes'));
+        const tituloIndex = lines.findIndex(line => line.includes('✨ ¡'));
+        
+        let mainContent = '';
+        let saludo = '';
+        let titulo = '';
+        
+        if (saludoIndex !== -1 && tituloIndex !== -1) {
+            saludo = lines[saludoIndex];
+            titulo = lines[tituloIndex];
+            mainContent = lines.slice(tituloIndex + 2).join('\n'); // +2 para saltar línea vacía después del título
+        } else {
+            mainContent = baseMessage;
+        }
+        
+        // Variante 1: Mensaje estándar (el original)
+        variants.push({
+            name: "Versión 1 - Original",
+            content: baseMessage
         });
-
-        // Especialidades fijas que siempre están (3 y 4)
-        specials.push("Mulitas de Cecina");
-        specials.push("Quesadillas de Masa Frita");
-
-        // Obtener ingredientes base seleccionados
-        const baseIngredientCheckboxes = document.querySelectorAll('.ingredients-preset input[type="checkbox"]:checked');
-        const baseIngredients = Array.from(baseIngredientCheckboxes).map(cb => cb.parentElement.textContent.trim());
-
-        // Obtener ingredientes personalizados
-        const customIngredientInputs = document.querySelectorAll('.custom-ingredient');
-        const customIngredients = Array.from(customIngredientInputs)
-            .map(input => input.value.trim())
-            .filter(ingredient => ingredient !== '');
-
-        // Combinar todos los ingredientes
-        const allIngredients = [...baseIngredients, ...customIngredients];
-
-        // Obtener bebidas base seleccionadas
-        const baseDrinkCheckboxes = document.querySelectorAll('.drinks-grid input[type="checkbox"]:checked');
-        const baseDrinks = Array.from(baseDrinkCheckboxes).map(cb => cb.parentElement.textContent.trim());
-
-        // Obtener bebidas personalizadas
-        const customDrinkInputs = document.querySelectorAll('.custom-drink');
-        const customDrinks = Array.from(customDrinkInputs)
-            .map(input => input.value.trim())
-            .filter(drink => drink !== '');
-
-        // Combinar todas las bebidas
-        const allDrinks = [...baseDrinks, ...customDrinks];
-
-        if (allIngredients.length === 0 && specials.length === 0) {
-            return '';
+        
+        // Variante 2: Mensaje más emotivo y personal
+        let saludo2, titulo2;
+        if (dayType === 'domingo') {
+            saludo2 = '🌞 ¡Feliz domingo! 🙌🏻\n¿Listo para consentirte con los sabores más auténticos? 😋🍲';
+            titulo2 = '✨ ¡Descubre nuestro menú dominguero! ✨';
+        } else if (dayType === 'tarde') {
+            saludo2 = '🌅 ¡Qué tal la tarde! 🙌🏻\nPerfecta para disfrutar de antojitos que alegran el alma… 😋🌮';
+            titulo2 = '✨ ¡Nuestro menú de hoy te va a encantar! ✨';
+        } else {
+            saludo2 = '🎉 ¡Hoy es día de celebrar! 🙌🏻\nDéjate consentir con nuestros platillos especiales… 😋🍽️';
+            titulo2 = '✨ ¡Menú especial para un día especial! ✨';
         }
-
-        // Construir mensaje Facebook (sin formato bold con *)
-        let message = `${config.saludo}\n\n${config.titulo}\n\n`;
-
-        if (specials.length > 0) {
-            message += `🍽 Especialidades:\n`;
-            specials.forEach(special => {
-                message += `✅ ${special}\n`;
-            });
-            message += `\n`;
+        
+        const variant2 = `${saludo2}\n\n${titulo2}\n\n${mainContent}`;
+        variants.push({
+            name: "Versión 2 - Emotiva",
+            content: variant2
+        });
+        
+        // Variante 3: Mensaje con enfoque en Coyuca y tradición
+        let saludo3, titulo3;
+        if (dayType === 'domingo') {
+            saludo3 = '🏖️ ¡Domingo de tradición en Coyuca! 🙌🏻\nEl sabor auténtico que merece tu domingo… 😋🍲';
+            titulo3 = '✨ ¡Sabores que hablan de nuestra tierra! ✨';
+        } else if (dayType === 'tarde') {
+            saludo3 = '🏖️ ¡Tarde coyunqueña! 🙌🏻\nDisfruta del verdadero sabor de Coyuca de Benítez… 😋🌮';
+            titulo3 = '✨ ¡Tradición y sabor en cada bocado! ✨';
+        } else {
+            saludo3 = '🎉 ¡Celebra con lo mejor de Coyuca! 🙌🏻\nSabores que hacen especial cualquier ocasión… 😋🍽️';
+            titulo3 = '✨ ¡Lo mejor de nuestra cocina para ti! ✨';
         }
+        
+        const variant3 = `${saludo3}\n\n${titulo3}\n\n${mainContent}`;
+        variants.push({
+            name: "Versión 3 - Tradición",
+            content: variant3
+        });
+        
+        return variants;
+    }
 
-        if (allIngredients.length > 0) {
-            message += `🌮 Sopes y Huaraches con:\n`;
-            allIngredients.forEach((ingredient, index) => {
-                const emojis = ['🔵', '🟢', '🟡', '🟠', '🔴', '🟣', '⚫', '⚪', '🟤', '🔶'];
-                message += `${emojis[index] || '✅'} ${ingredient}\n`;
-            });
-            message += `\n`;
-        }
-
-        if (allDrinks.length > 0) {
-            message += `🥤 Bebidas:\n`;
-            allDrinks.forEach(drink => {
-                message += `➡ ${drink}\n`;
-            });
-            message += `\n`;
-        }
-
-        message += `📍 Ubicación: Coyuca de Benítez (solo zona centro)\n` +
-                   `🛵 Servicio a domicilio\n` +
-                   `📲 Haz tu pedido al: 781 100 3796\n\n` +
-                   `🎉 ¡Dale sabor a tu ${dayType === 'domingo' ? 'tarde de domingo' : 'tarde'} con nosotros! 🤩🔥`;
-
-        return message;
+    // Función para actualizar la interfaz con las variantes
+    function updateVariantsInterface(whatsappVariants, facebookVariants, dayType) {
+        // Limpiar selectores de variantes si existen
+        const existingSelectors = document.querySelectorAll('.variant-selector');
+        existingSelectors.forEach(selector => selector.remove());
+        
+        // Crear selector para variantes de WhatsApp
+        const whatsappSelector = document.createElement('div');
+        whatsappSelector.className = 'variant-selector';
+        whatsappSelector.innerHTML = `
+            <label for="whatsappVariant">🔄 Selecciona una versión para WhatsApp:</label>
+            <select id="whatsappVariant" class="variant-dropdown">
+                ${whatsappVariants.map((variant, index) => 
+                    `<option value="${index}">${variant.name}</option>`
+                ).join('')}
+            </select>
+            <button id="randomWhatsappBtn" class="random-variant-btn">🎲 Cambiar descripciones</button>
+        `;
+        
+        // Insertar después del textarea de WhatsApp
+        const whatsappTab = document.getElementById('whatsapp-tab');
+        const whatsappTextarea = whatsappTab.querySelector('textarea');
+        whatsappTextarea.parentNode.insertBefore(whatsappSelector, whatsappTextarea.nextSibling);
+        
+        // Crear selector para variantes de Facebook
+        const facebookSelector = document.createElement('div');
+        facebookSelector.className = 'variant-selector';
+        facebookSelector.innerHTML = `
+            <label for="facebookVariant">🔄 Selecciona una versión para Facebook:</label>
+            <select id="facebookVariant" class="variant-dropdown">
+                ${facebookVariants.map((variant, index) => 
+                    `<option value="${index}">${variant.name}</option>`
+                ).join('')}
+            </select>
+            <button id="randomFacebookBtn" class="random-variant-btn">🎲 Cambiar descripciones</button>
+        `;
+        
+        // Insertar después del textarea de Facebook
+        const facebookTab = document.getElementById('facebook-tab');
+        const facebookTextarea = facebookTab.querySelector('textarea');
+        facebookTextarea.parentNode.insertBefore(facebookSelector, facebookTextarea.nextSibling);
+        
+        // Actualizar textareas con la primera variante
+        whatsappOutput.value = whatsappVariants[0].content;
+        facebookOutput.value = facebookVariants[0].content;
+        
+        // Event listeners para selectores de WhatsApp
+        const whatsappVariantSelect = document.getElementById('whatsappVariant');
+        whatsappVariantSelect.addEventListener('change', function() {
+            const selectedIndex = parseInt(this.value);
+            whatsappOutput.value = whatsappVariants[selectedIndex].content;
+        });
+        
+        const randomWhatsappBtn = document.getElementById('randomWhatsappBtn');
+        randomWhatsappBtn.addEventListener('click', function() {
+            const randomIndex = Math.floor(Math.random() * whatsappVariants.length);
+            whatsappVariantSelect.value = randomIndex;
+            whatsappOutput.value = whatsappVariants[randomIndex].content;
+        });
+        
+        // Event listeners para selectores de Facebook
+        const facebookVariantSelect = document.getElementById('facebookVariant');
+        facebookVariantSelect.addEventListener('change', function() {
+            const selectedIndex = parseInt(this.value);
+            facebookOutput.value = facebookVariants[selectedIndex].content;
+        });
+        
+        const randomFacebookBtn = document.getElementById('randomFacebookBtn');
+        randomFacebookBtn.addEventListener('click', function() {
+            const randomIndex = Math.floor(Math.random() * facebookVariants.length);
+            facebookVariantSelect.value = randomIndex;
+            facebookOutput.value = facebookVariants[randomIndex].content;
+        });
     }
 
     // Generar menú
@@ -366,8 +436,13 @@ document.addEventListener('DOMContentLoaded', function() {
             return; // Ya se mostró el alert en generateWhatsAppMessage
         }
 
-        whatsappOutput.value = whatsappMessage;
-        facebookOutput.value = facebookMessage;
+        // Generar variantes
+        const dayType = dayTypeSelect.value;
+        const whatsappVariants = generateMessageVariants(whatsappMessage, 'whatsapp', dayType);
+        const facebookVariants = generateMessageVariants(facebookMessage, 'facebook', dayType);
+
+        // Actualizar la interfaz para mostrar variantes
+        updateVariantsInterface(whatsappVariants, facebookVariants, dayType);
 
         // Guardar en historial
         const menuData = {
