@@ -244,7 +244,7 @@ document.addEventListener('DOMContentLoaded', function() {
                    `${platform === 'whatsapp' ? '*' : ''}📲 Pedidos con anticipación${platform === 'whatsapp' ? '*' : ''}\n` +
                    `   ${platform === 'whatsapp' ? '*' : ''}¡Todo fresco y al momento!${platform === 'whatsapp' ? '*' : ''}\n` +
                    `   ${platform === 'whatsapp' ? '*' : ''}Llama o escribe al:${platform === 'whatsapp' ? '*' : ''}\n` +
-                   `📲 781 109 3796\n\n`;
+                   `📲 781 109 8952\n\n`;
 
         return {
             message: message,
